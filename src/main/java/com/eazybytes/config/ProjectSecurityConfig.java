@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -34,46 +35,8 @@ public class ProjectSecurityConfig {
         return http.build();
     }
 
-    /*
-    @Bean
-     public InMemoryUserDetailsManager userDetailsService() {
-
-         // use withDefaultPasswordEncoder
-//         UserDetails admin = User.withDefaultPasswordEncoder()
-//                 .username("admin")
-//                 .password("1234")
-//                 .authorities("admin")
-//                 .build();
-//         UserDetails user = User.withDefaultPasswordEncoder()
-//                 .username("user")
-//                 .password("1234")
-//                 .authorities("read")
-//                 .build();
-//         return new InMemoryUserDetailsManager(admin,user);
-
-        //use NoOpPasswordEncoder Bean
-         UserDetails admin = User.withUsername("admin")
-                 .password("1234")
-                 .authorities("admin")
-                 .build();
-         UserDetails user = User.withUsername("user")
-                 .password("1234")
-                 .authorities("read")
-                 .build();
-         return new InMemoryUserDetailsManager(admin,user);
-
-    }
-    */
-
-//    @Bean
-//    public UserDetailsService userDetailsService(DataSource dataSource) {
-//        return new JdbcUserDetailsManager(dataSource);
-//    }
-
-
-
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder();
     }
 }
