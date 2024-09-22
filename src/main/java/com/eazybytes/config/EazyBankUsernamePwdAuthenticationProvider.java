@@ -1,5 +1,6 @@
 package com.eazybytes.config;
 
+import com.eazybytes.model.Authority;
 import com.eazybytes.model.Customer;
 import com.eazybytes.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @ComponentScan
 @RequiredArgsConstructor
@@ -33,9 +35,7 @@ public class EazyBankUsernamePwdAuthenticationProvider implements Authentication
         Optional<Customer> customer = customerRepository.findByEmail(username);
         if (customer.isPresent()) {
             if (passwordEncoder.matches(pwd, customer.get().getPwd())) {
-                List<GrantedAuthority> authorities = new ArrayList<>();
-                authorities.add(new SimpleGrantedAuthority(customer.get().getRole()));
-                return new UsernamePasswordAuthenticationToken(username, pwd, authorities);
+                return new UsernamePasswordAuthenticationToken(username, pwd, getGrantAuthorities(customer.get().getAuthorities()));
             } else {
                 throw new BadCredentialsException("Invalid password!");
             }
@@ -47,5 +47,13 @@ public class EazyBankUsernamePwdAuthenticationProvider implements Authentication
     @Override
     public boolean supports(Class<?> authentication) {
         return (UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication));
+    }
+
+    private List<GrantedAuthority> getGrantAuthorities(Set<Authority> authorities) {
+        List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
+        for (Authority authority : authorities) {
+            grantedAuthorities.add(new SimpleGrantedAuthority(authority.getName()));
+        }
+        return grantedAuthorities;
     }
 }

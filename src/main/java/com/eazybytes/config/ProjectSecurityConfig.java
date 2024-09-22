@@ -31,7 +31,7 @@ import java.util.Collections;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
-public class ProjectSecurityConfig {
+public class  ProjectSecurityConfig {
 
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -59,8 +59,17 @@ public class ProjectSecurityConfig {
             .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
             .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class) //BasicAuthenticationFilter를 먼저 실행하고 CsrfCookieFilter를 실행해줘
             .authorizeRequests((requests) -> requests
-            .requestMatchers("/myAcount","/myBalance","/myCards","/myLoans","/user").authenticated()
-            .requestMatchers("/notices","/contact","/register").permitAll()
+//                .requestMatchers("/myAccount").hasAuthority("VIEWACCOUNT")
+//                .requestMatchers("/myBalance").hasAnyAuthority("VIEWACCOUNT","VIEWBALANCE")
+//                .requestMatchers("/myLoans").hasAuthority("VIEWLOANS")
+//                .requestMatchers("/myCards").hasAuthority("VIEWCARDS")
+//                .requestMatchers("/user").authenticated()
+                .requestMatchers("/myAccount").hasRole("USER")
+                .requestMatchers("/myBalance").hasAnyRole("USER","ADMIN")
+                .requestMatchers("/myLoans").hasRole("USER")
+                .requestMatchers("/myCards").hasRole("USER")
+                .requestMatchers("/user").authenticated()
+                .requestMatchers("/notices","/contact","/register").permitAll()
         );
         http.formLogin(withDefaults());
         http.httpBasic(withDefaults());
