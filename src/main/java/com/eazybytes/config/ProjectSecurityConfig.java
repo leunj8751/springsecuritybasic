@@ -1,6 +1,7 @@
 package com.eazybytes.config;
 
 import com.eazybytes.filter.CsrfCookieFilter;
+import com.eazybytes.filter.RequestValidationBeforeFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
@@ -58,12 +59,8 @@ public class  ProjectSecurityConfig {
         .csrf(csrf -> csrf.csrfTokenRequestHandler(requestHandler).ignoringRequestMatchers("/contact","register")
             .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
             .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class) //BasicAuthenticationFilter를 먼저 실행하고 CsrfCookieFilter를 실행해줘
-            .authorizeRequests((requests) -> requests
-//                .requestMatchers("/myAccount").hasAuthority("VIEWACCOUNT")
-//                .requestMatchers("/myBalance").hasAnyAuthority("VIEWACCOUNT","VIEWBALANCE")
-//                .requestMatchers("/myLoans").hasAuthority("VIEWLOANS")
-//                .requestMatchers("/myCards").hasAuthority("VIEWCARDS")
-//                .requestMatchers("/user").authenticated()
+            .addFilterBefore(new RequestValidationBeforeFilter(),BasicAuthenticationFilter.class)
+                .authorizeRequests((requests) -> requests
                 .requestMatchers("/myAccount").hasRole("USER")
                 .requestMatchers("/myBalance").hasAnyRole("USER","ADMIN")
                 .requestMatchers("/myLoans").hasRole("USER")
