@@ -51,4 +51,12 @@ public class LoginController {
         return customer.orElse(null);
 
     }
+
+//    @PostMapping("apiLogin")
+//    public ResponseEntity<String> apiLogin(@RequestBody Customer loginRequest) {
+//        //인증 프로세스 수등으로 시작
+//
+//
+//    }
+
 }
