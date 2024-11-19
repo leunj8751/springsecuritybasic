@@ -1,35 +1,17 @@
 package com.eazybytes.config;
 
 import com.eazybytes.filter.CsrfCookieFilter;
-import com.eazybytes.filter.JWTTokenGeneratorFilter;
-import com.eazybytes.filter.JWTTokenValidatorFilter;
-import com.eazybytes.filter.RequestValidationBeforeFilter;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
-
-import javax.sql.DataSource;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,6 +20,9 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 public class  ProjectSecurityConfig {
+
+    // access토큰 or JWT 토큰의 생성은 KeyClock에서 이루어질것이다.
+    // 더이상 로그인 작업을 담당하지 않기 때문에 이전에 작성한 필요없는 코드들은 싹 지운다!!
 
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -64,9 +49,6 @@ public class  ProjectSecurityConfig {
         .csrf(csrf -> csrf.csrfTokenRequestHandler(requestHandler).ignoringRequestMatchers("/contact","/register")
             .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
             .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class) //BasicAuthenticationFilter를 먼저 실행하고 CsrfCookieFilter를 실행해줘
-            .addFilterBefore(new RequestValidationBeforeFilter(),BasicAuthenticationFilter.class)
-            .addFilterAfter(new JWTTokenGeneratorFilter(),BasicAuthenticationFilter.class) // 인증 성공 후 JWT 생성하는 옵션
-            .addFilterBefore(new JWTTokenValidatorFilter(),BasicAuthenticationFilter.class)
                 .authorizeRequests((requests) -> requests
                 .requestMatchers("/myAccount").hasRole("USER")
                 .requestMatchers("/myBalance").hasAnyRole("USER","ADMIN")
@@ -79,23 +61,5 @@ public class  ProjectSecurityConfig {
         http.httpBasic(withDefaults());
         return http.build();
     }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-
-    //인증 매커니즘을 시작하는 역할
-//    @Bean
-//    public AuthenticationManager authenticationManager(UserDetailsService userDetailsService,
-//                                                       PasswordEncoder passwordEncoder) {
-//        EazyBankUsernamePwdAuthenticationProvider authenticationProvider =
-//                new EazyBankUsernamePwdAuthenticationProvider(userDetailsService, passwordEncoder);
-//        ProviderManager providerManager = new ProviderManager(authenticationProvider);
-//        providerManager.setEraseCredentialsAfterAuthentication(false); // Authentication 객체 내부의 비밀번호를 지우지 않음
-//        return  providerManager;
-//    }
-
 
 }
